@@ -5,6 +5,7 @@
     <Authors>Anton Shyrokykh</Authors>
     <Company>Zwapgrid</Company>
     <Description>Redis-based implementation of application lock</Description>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
