@@ -31,16 +31,28 @@ namespace Abp.Locking.Redis
             _retryTime = options.DefaultRetryTime;
         }
 
-        // TODO implement
         public bool CheckLockSet(string key)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+
+            using (var connection = ConnectionMultiplexer.Connect(_connectionString))
+            {
+                var redisDb = connection.GetDatabase(_databaseId);
+                return redisDb.KeyExists(GetLockKey(key), CommandFlags.DemandMaster);
+            }
         }
 
-        // TODO implement
-        public Task<bool> CheckLockSetAsync(string key)
+        public async Task<bool> CheckLockSetAsync(string key)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+
+            using (var connection = ConnectionMultiplexer.Connect(_connectionString))
+            {
+                var redisDb = connection.GetDatabase(_databaseId);
+                return await redisDb.KeyExistsAsync(GetLockKey(key), CommandFlags.DemandMaster);
+            }
         }
 
         public void PerformInLock(string key, Action actionTodo)
