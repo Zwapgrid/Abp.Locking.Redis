@@ -43,40 +43,108 @@ namespace Abp.Locking.Redis
             throw new NotImplementedException();
         }
 
-        // TODO implement
         public void PerformInLock(string key, Action actionTodo)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            PerformInLock(key, actionTodo, cancellationToken: default);
         }
 
-        // TODO implement
         public void PerformInLock(string key, Action actionTodo, TimeSpan? expireIn = null)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            expireIn = expireIn ?? _expirityTime;
+            PerformInLock(key, actionTodo, expireIn: expireIn.Value, cancellationToken: default);
         }
 
-        // TODO implement
         public void PerformInLock(string key, Action actionTodo, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            PerformInLock(key, actionTodo, cancellationToken: cancellationToken);
         }
 
-        // TODO implement
+        private void PerformInLock(string key, Action actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken = default)
+        {
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            expireIn = expireIn ?? _expirityTime;
+
+            using (var connection = ConnectionMultiplexer.Connect(_connectionString))
+            {
+                var redLockMultiplexer = (RedLockMultiplexer)connection;
+                redLockMultiplexer.RedisDatabase = _databaseId;
+                using (var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { connection }, null))
+                {
+                    var resource = GetLockKey(key);
+
+                    using (factory.CreateLock(resource, expiryTime: expireIn.Value, waitTime: _waitTime, retryTime: _retryTime, cancellationToken: cancellationToken))
+                    {
+                        actionTodo();
+                    }
+                }
+            }
+        }
+
         public TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            return PerformInLock(key, actionTodo, cancellationToken: default);
         }
 
-        // TODO implement
         public TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo, TimeSpan? expireIn = null)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            expireIn = expireIn ?? _expirityTime;
+            return PerformInLock(key, actionTodo, expireIn: expireIn.Value, cancellationToken: default);
         }
 
-        // TODO implement
         public TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            return PerformInLock(key, actionTodo, cancellationToken: cancellationToken);
+        }
+
+        private TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken = default)
+        {
+            if (key.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(key));
+            if (actionTodo == null)
+                throw new ArgumentNullException(nameof(actionTodo));
+            expireIn = expireIn ?? _expirityTime;
+
+            using (var connection = ConnectionMultiplexer.Connect(_connectionString))
+            {
+                var redLockMultiplexer = (RedLockMultiplexer)connection;
+                redLockMultiplexer.RedisDatabase = _databaseId;
+                using (var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { connection }, null))
+                {
+                    var resource = GetLockKey(key);
+
+                    using (factory.CreateLock(resource, expiryTime: expireIn.Value, waitTime: _waitTime, retryTime: _retryTime, cancellationToken: cancellationToken))
+                    {
+                        return actionTodo();
+                    }
+                }
+            }
         }
 
         public Task PerformInLockAsync(string key, Func<Task> actionTodo)
@@ -118,7 +186,7 @@ namespace Abp.Locking.Redis
             using (var connection = ConnectionMultiplexer.Connect(_connectionString))
             {
                 var redLockMultiplexer = (RedLockMultiplexer)connection;
-                redLockMultiplexer.RedisDatabase = _databaseId; // TODO check if it is needed ?
+                redLockMultiplexer.RedisDatabase = _databaseId;
                 using (var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { connection }, null))
                 {
                     var resource = GetLockKey(key);
@@ -170,7 +238,7 @@ namespace Abp.Locking.Redis
             using (var connection = ConnectionMultiplexer.Connect(_connectionString))
             {
                 var redLockMultiplexer = (RedLockMultiplexer)connection;
-                redLockMultiplexer.RedisDatabase = _databaseId; // TODO check if it is needed ?
+                redLockMultiplexer.RedisDatabase = _databaseId;
                 using (var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { connection }, null))
                 {
                     var resource = GetLockKey(key);
