@@ -61,7 +61,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            PerformInLock(key, actionTodo, cancellationToken: default);
+            PerformInLock(key, actionTodo, expireIn:null, cancellationToken: default);
         }
 
         public void PerformInLock(string key, Action actionTodo, TimeSpan? expireIn = null)
@@ -70,8 +70,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            expireIn = expireIn ?? _expirityTime;
-            PerformInLock(key, actionTodo, expireIn: expireIn.Value, cancellationToken: default);
+            PerformInLock(key, actionTodo, expireIn: expireIn, cancellationToken: default);
         }
 
         public void PerformInLock(string key, Action actionTodo, CancellationToken cancellationToken = default)
@@ -80,10 +79,10 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            PerformInLock(key, actionTodo, cancellationToken: cancellationToken);
+            PerformInLock(key, actionTodo, expireIn:null, cancellationToken: cancellationToken);
         }
 
-        private void PerformInLock(string key, Action actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken = default)
+        private void PerformInLock(string key, Action actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken)
         {
             if (key.IsNullOrEmpty())
                 throw new ArgumentNullException(nameof(key));
@@ -113,7 +112,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            return PerformInLock(key, actionTodo, cancellationToken: default);
+            return PerformInLock(key, actionTodo, expireIn:null, cancellationToken: default);
         }
 
         public TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo, TimeSpan? expireIn = null)
@@ -122,8 +121,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            expireIn = expireIn ?? _expirityTime;
-            return PerformInLock(key, actionTodo, expireIn: expireIn.Value, cancellationToken: default);
+            return PerformInLock(key, actionTodo, expireIn: expireIn, cancellationToken: default);
         }
 
         public TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo, CancellationToken cancellationToken = default)
@@ -132,10 +130,10 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            return PerformInLock(key, actionTodo, cancellationToken: cancellationToken);
+            return PerformInLock(key, actionTodo, expireIn: null, cancellationToken: cancellationToken);
         }
 
-        private TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken = default)
+        private TResult PerformInLock<TResult>(string key, Func<TResult> actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken)
         {
             if (key.IsNullOrEmpty())
                 throw new ArgumentNullException(nameof(key));
@@ -165,7 +163,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            return PerformInLockAsync(key, actionTodo, cancellationToken: default);
+            return PerformInLockAsync(key, actionTodo, expireIn:null, cancellationToken: default);
         }
 
         public Task PerformInLockAsync(string key, Func<Task> actionTodo, TimeSpan? expireIn = null)
@@ -174,8 +172,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            expireIn = expireIn ?? _expirityTime;
-            return PerformInLockAsync(key, actionTodo, expireIn: expireIn.Value, cancellationToken: default);
+            return PerformInLockAsync(key, actionTodo, expireIn: expireIn, cancellationToken: default);
         }
 
         public Task PerformInLockAsync(string key, Func<Task> actionTodo, CancellationToken cancellationToken = default)
@@ -184,10 +181,10 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            return PerformInLockAsync(key, actionTodo, cancellationToken: cancellationToken);
+            return PerformInLockAsync(key, actionTodo, expireIn:null, cancellationToken: cancellationToken);
         }
 
-        public async Task PerformInLockAsync(string key, Func<Task> actionTodo, TimeSpan? expireIn = null, CancellationToken cancellationToken = default)
+        private async Task PerformInLockAsync(string key, Func<Task> actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken)
         {
             if (key.IsNullOrEmpty())
                 throw new ArgumentNullException(nameof(key));
@@ -217,7 +214,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            return PerformInLockAsync(key, actionTodo, expireIn: _expirityTime, cancellationToken: default);
+            return PerformInLockAsync(key, actionTodo, expireIn: null, cancellationToken: default);
         }
 
         public Task<TResult> PerformInLockAsync<TResult>(string key, Func<Task<TResult>> actionTodo, TimeSpan? expireIn = null)
@@ -226,8 +223,7 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            expireIn = expireIn ?? _expirityTime;
-            return PerformInLockAsync(key, actionTodo, expireIn: expireIn.Value, cancellationToken: default);
+            return PerformInLockAsync(key, actionTodo, expireIn: expireIn, cancellationToken: default);
         }
 
         public Task<TResult> PerformInLockAsync<TResult>(string key, Func<Task<TResult>> actionTodo, CancellationToken cancellationToken = default)
@@ -236,10 +232,10 @@ namespace Abp.Locking.Redis
                 throw new ArgumentNullException(nameof(key));
             if (actionTodo == null)
                 throw new ArgumentNullException(nameof(actionTodo));
-            return PerformInLockAsync(key, actionTodo, cancellationToken: cancellationToken);
+            return PerformInLockAsync(key, actionTodo, expireIn:null, cancellationToken: cancellationToken);
         }
 
-        private async Task<TResult> PerformInLockAsync<TResult>(string key, Func<Task<TResult>> actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken = default)
+        private async Task<TResult> PerformInLockAsync<TResult>(string key, Func<Task<TResult>> actionTodo, TimeSpan? expireIn, CancellationToken cancellationToken)
         {
             if (key.IsNullOrEmpty())
                 throw new ArgumentNullException(nameof(key));
